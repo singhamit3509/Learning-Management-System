@@ -39,7 +39,7 @@ const CourseInstructor = async ({course}) => {
                         <ul className="list space-y-4">
                           <li className="flex items-center space-x-3">
                             <Presentation className="text-gray-600" />
-                            <div>{courseDetailsByInstructor?.courses} Courses</div>
+                            <div>{courseDetailsByInstructor?.courses}+ Courses</div>
                           </li>
                           <li className="flex space-x-3">
                             <UsersRound className="text-gray-600" />
