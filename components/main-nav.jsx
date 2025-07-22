@@ -67,10 +67,10 @@ const MainNav = ({items,children}) => {
             <Button variant="outline" size="sm">Register</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56 mt-4">
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem asChild className="cursor-pointer">
                 <Link href='/register/student'>Student</Link> 
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem asChild className="cursor-pointer">
                 <Link href='/register/instructor'>Instructor</Link> 
             </DropdownMenuItem> 
         </DropdownMenuContent>  

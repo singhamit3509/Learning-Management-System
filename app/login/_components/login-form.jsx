@@ -1,6 +1,5 @@
 'use client'
 import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
 export function LoginForm() {
 
@@ -35,6 +35,7 @@ export function LoginForm() {
   if (result.error) {
     setError(result.error);
   } else {
+    toast.success("Login Successfuly!")
     router.push("/courses");
   }
 }
