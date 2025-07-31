@@ -49,8 +49,22 @@ export async function getCourseDetails(id) {
     return replaceMongoIdInObject(course);
 }
 
-export async function getCourseDetailsByInstructor(instructorId){
-    const courses = await Course.find({instructor: instructorId }).lean();
+function groupBy(array, keyFn){
+    return array.reduce((acc, item) => {
+        const key = keyFn(item);
+        if(!acc[key]){
+            acc[key] = [];
+        }
+        acc[key].push(item);
+        return acc
+    },{});
+}
+
+export async function getCourseDetailsByInstructor(instructorId, expand){
+    const courses = await Course.find({instructor: instructorId })
+    .populate({path: "category", model: Category })
+    .populate({ path: "instructor", model: User})
+    .lean();
 
     const enrollments = await Promise.all(
         courses.map(async (course) => {
@@ -59,6 +73,14 @@ export async function getCourseDetailsByInstructor(instructorId){
                 return enrollment;
         })
     );
+
+    //Group Enrollment By Courses
+    const groupByCourses = groupBy(enrollments.flat(), (item) => item.courses);
+    //Calculate Total Revenue
+    const totalRevenue = courses.reduce((acc, course) => {
+        const enrollmentsForCourse = groupByCourses[course._id] || [];
+        return acc + enrollmentsForCourse.length * course.price;
+    },0);
 
     const totalEnrollments = enrollments.reduce(( acc, obj )=> {
         return acc + obj.length;
@@ -77,10 +99,40 @@ export async function getCourseDetailsByInstructor(instructorId){
         return acc + obj.rating;
     },0)) / totalTestimonials.length; 
 
+
+
+    const firstName = courses.length > 0 ? courses[0]?.instructor?.
+    firstName : "Unknown";
+
+    const lastName = courses.length > 0 ? courses[0]?.instructor?.
+    lastName : "Unknown";
+
+    const fullInsName = `${firstName} ${lastName}`;
+
+    const Designation = courses.length > 0 ? courses[0]?.instructor?.
+    designation : "Unknown"; 
+
+    const insImage = courses.length > 0 ? courses[0]?.instructor?.
+    profilePicture : "Unknown"; 
+
+    if (expand) {
+        return{
+            "courses" : courses?.flat(),
+        "enrollments": enrollments?.flat(),
+        "reviews" : totalTestimonials,
+        }
+    }
+
+
     return {
         "courses" : courses.length,
         "enrollments": totalEnrollments,
         "reviews" : totalTestimonials.length,
-        "ratings" : avgRating.toPrecision(2)
+        "ratings" : avgRating.toPrecision(2),
+        "inscourses" : courses,
+        "revenue" : totalRevenue,
+        fullInsName,
+        Designation,
+        insImage
     } 
 }
