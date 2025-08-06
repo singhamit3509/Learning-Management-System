@@ -136,3 +136,12 @@ export async function getCourseDetailsByInstructor(instructorId, expand){
         insImage
     } 
 }
+
+export async function create(courseData) {
+    try {
+        const course = await Course.create(CourseData);
+        return JSON.parse(JSON.stringify(course));
+    } catch (error) {
+        throw new Error(error);
+    }
+}
